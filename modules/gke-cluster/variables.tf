@@ -31,3 +31,8 @@ variable "gcp_network_name" {
   description = "The name of the GCP Network"
   type        = string
 }
+
+variable "gcp_subnet_name" {
+  description = "The name of the GCP Network"
+  type        = string
+}

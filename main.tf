@@ -1,6 +1,6 @@
 module "baremetal-anthos-cluster" {
   source             = "github.com/GCPartner/terraform-gcpartner-anthos-baremetal?ref=v0.0.1"
-  cluster_name       = format("pnap-%s",var.cluster_name)
+  cluster_name       = format("pnap-%s", var.cluster_name)
   cloud              = var.cloud
   pnap_client_id     = var.pnap_client_id
   pnap_client_secret = var.pnap_client_secret
@@ -17,7 +17,7 @@ module "gcp-networking" {
   cluster_name   = var.cluster_name
   gcp_router_asn = var.gcp_router_asn
   gcp_project_id = var.gcp_project_id
-  gcp_region = var.gcp_region
+  gcp_region     = var.gcp_region
 }
 
 module "gke-cluster" {
@@ -29,6 +29,7 @@ module "gke-cluster" {
   gke_release_channel = var.gke_release_channel
   gke_machine_type    = var.gke_machine_type
   gcp_network_name    = module.gcp-networking.gcp_network_name
+  gcp_subnet_name     = module.gcp-networking.gcp_subnet_name
 }
 
 module "megaport" {

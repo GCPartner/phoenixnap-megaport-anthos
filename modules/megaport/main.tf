@@ -55,7 +55,7 @@ resource "megaport_gcp_connection" "gcp_interconnect" {
   }
 
   csp_settings {
-    pairing_key = var.interconnect_pairing_key
+    pairing_key          = var.interconnect_pairing_key
     requested_product_id = data.megaport_partner_port.gcp_port.id
   }
 }
