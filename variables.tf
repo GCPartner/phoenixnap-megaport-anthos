@@ -49,7 +49,7 @@ variable "ansible_tar_ball" {
 variable "gcp_region" {
   description = "The GCP Region"
   type        = string
-  default     = "us-west3"
+  default     = "us-west4"
 }
 
 variable "gke_node_count" {
@@ -89,4 +89,31 @@ variable "megaport_username" {
 variable "megaport_password" {
   description = "The password for Megaport"
   type        = string
+}
+
+variable "domain_name" {
+  description = "The domain name to use for DNS records"
+  type        = string
+}
+
+variable "cert_manager_version" {
+  description = "The version of cert manager to install"
+  type        = string
+  default     = "v1.8.0"
+}
+
+variable "email_address" {
+  description = "The email address to use with Cert Manager"
+  type        = string
+}
+
+variable "pnap_network_name" {
+  type        = string
+  default     = ""
+  description = "The network_id to use when creating server in PNAP"
+}
+
+variable "pnap_backend_megaport_vlan_id" {
+  type        = number
+  description = "The vLan ID mapped on the MegaPort side by PNAP (Provided by PNAP)"
 }

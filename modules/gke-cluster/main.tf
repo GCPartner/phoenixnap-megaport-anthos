@@ -11,9 +11,15 @@ resource "google_container_cluster" "primary" {
   }
   node_config {
     machine_type = var.gke_machine_type
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/ndev.clouddns.readwrite"
+    ]
   }
   ip_allocation_policy {
     cluster_secondary_range_name  = "k8s-pod-range"
     services_secondary_range_name = "k8s-service-range"
+  }
+  lifecycle {
+    ignore_changes = all
   }
 }

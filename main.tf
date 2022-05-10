@@ -7,9 +7,14 @@ module "baremetal-anthos-cluster" {
   pnap_location      = var.pnap_location
   pnap_worker_type   = var.pnap_worker_type
   pnap_cp_type       = var.pnap_cp_type
+  pnap_network_name  = var.pnap_network_name
   gcp_project_id     = var.gcp_project_id
   ansible_url        = var.ansible_url
   ansible_tar_ball   = var.ansible_tar_ball
+}
+
+locals {
+  redis_load_balancer_ip = cidrhost(module.baremetal-anthos-cluster.private_subnet, -4)
 }
 
 module "gcp-networking" {
@@ -33,12 +38,39 @@ module "gke-cluster" {
 }
 
 module "megaport" {
-  source                   = "./modules/megaport"
-  prefix                   = var.cluster_name
-  megaport_requested_asn   = var.megaport_requested_asn
-  interconnect_pairing_key = module.gcp-networking.interconnect_pairing_key
-  pnap_vlan_id             = module.baremetal-anthos-cluster.vlan_id
-  private_subnet           = module.baremetal-anthos-cluster.private_subnet
-  megaport_username        = var.megaport_username
-  megaport_password        = var.megaport_password
+  source                        = "./modules/megaport"
+  prefix                        = var.cluster_name
+  megaport_requested_asn        = var.megaport_requested_asn
+  interconnect_pairing_key      = module.gcp-networking.interconnect_pairing_key
+  pnap_vlan_id                  = module.baremetal-anthos-cluster.vlan_id
+  private_subnet                = module.baremetal-anthos-cluster.private_subnet
+  megaport_username             = var.megaport_username
+  megaport_password             = var.megaport_password
+  pnap_backend_megaport_vlan_id = var.pnap_backend_megaport_vlan_id
+}
+
+module "on-prem-services" {
+  depends_on = [
+    module.baremetal-anthos-cluster
+  ]
+  source                 = "./modules/on-prem-services"
+  ssh_key_path           = module.baremetal-anthos-cluster.ssh_key_path
+  bastion_ip             = module.baremetal-anthos-cluster.bastion_host_ip
+  username               = module.baremetal-anthos-cluster.bastion_host_username
+  redis_load_balancer_ip = local.redis_load_balancer_ip
+}
+
+module "cloud-services" {
+  depends_on = [
+    module.gke-cluster,
+    module.on-prem-services
+  ]
+  source                 = "./modules/cloud-services"
+  cluster_name           = format("gke-%s", var.cluster_name)
+  domain_name            = var.domain_name
+  email_address          = var.email_address
+  cert_manager_version   = var.cert_manager_version
+  gcp_region             = var.gcp_region
+  gcp_project_id         = var.gcp_project_id
+  redis_load_balancer_ip = local.redis_load_balancer_ip
 }

@@ -77,6 +77,6 @@ resource "megaport_vxc" "bmc_vxc" {
 
   b_end {
     port_id        = local.megaport_port_id
-    requested_vlan = var.pnap_vlan_id
+    requested_vlan = var.pnap_backend_megaport_vlan_id
   }
 }
