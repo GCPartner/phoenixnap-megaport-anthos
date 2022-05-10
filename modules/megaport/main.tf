@@ -58,6 +58,10 @@ resource "megaport_gcp_connection" "gcp_interconnect" {
     pairing_key          = var.interconnect_pairing_key
     requested_product_id = data.megaport_partner_port.gcp_port.id
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 // Create VXC between Megaport MCR and BMC

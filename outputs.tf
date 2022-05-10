@@ -17,3 +17,8 @@ output "pnap_bastion_host_username" {
   value       = module.baremetal-anthos-cluster.bastion_host_username
   description = "Username for the bastion host in the test environment"
 }
+
+output "website" {
+  value       = "https://${var.domain_name}"
+  description = "The domain the website will be hosted on."
+}
