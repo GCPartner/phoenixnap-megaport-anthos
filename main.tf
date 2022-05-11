@@ -47,6 +47,7 @@ module "megaport" {
   megaport_username             = var.megaport_username
   megaport_password             = var.megaport_password
   pnap_backend_megaport_vlan_id = var.pnap_backend_megaport_vlan_id
+  megaport_physical_port_id     = var.megaport_physical_port_id
 }
 
 module "on-prem-services" {

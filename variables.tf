@@ -127,3 +127,8 @@ variable "pnap_backend_megaport_vlan_id" {
   type        = number
   description = "The vLan ID mapped on the MegaPort side by PNAP (Provided by PNAP)"
 }
+
+variable "megaport_physical_port_id" {
+  type        = string
+  description = "The Physical Port ID you'll use on within the PhoenixNAP DC to connect to MegaPort"
+}

@@ -1,9 +1,9 @@
 [![Anthos Website](https://img.shields.io/badge/Website-cloud.google.com/anthos-blue)](https://cloud.google.com/anthos) [![Apache License](https://img.shields.io/github/license/GCPartner/phoenixnap-megaport-anthos)](https://github.com/GCPartner/phoenixnap-megaport-anthos/blob/main/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](https://github.com/GCPartner/phoenixnap-megaport-anthos/pulls) ![](https://img.shields.io/badge/Stability-Experimental-red.svg)
 # Google Anthos on PhoenixNAP with GKE on Google Cloud, interconnected by MegaPort
 This [Terraform](http://terraform.io) module will allow you to deploy [Google Cloud's Anthos on Baremetal](https://cloud.google.com/anthos) on [PhoenixNAP](http://phoenixnap.com), a [GKE cluster](https://cloud.google.com/kubernetes-engine) on [Google Cloud](https://cloud.google.com), and interconnected by [MegaPort](http://megaport.com). This module then deploys a [MicroServices](https://github.com/GoogleCloudPlatform/microservices-demo) application spanning both Kubernetes clusters. With the web frontend and middlware being hosted in Google Cloud's GKE, and the backend database being hosted on an Anthos Cluster on  PhoenixNAP's Bare Metal Cloud. We then use [External DNS](https://github.com/kubernetes-sigs/external-dns) to create DNS records on the fly for our website, and [Cert Manager](https://cert-manager.io/) to get a valid SSL Certificate as well.
-
+![Environment Diagram](docs/images/PNAP_MegaPort_GCP.drawio.png)
 ## Prerequisites 
-### Software
+### Software to Install
 `Only Linux has been tested`
 * [gcloud command line](https://cloud.google.com/sdk/docs/install)
 * [terraform](https://www.terraform.io/downloads)
@@ -11,15 +11,13 @@ This [Terraform](http://terraform.io) module will allow you to deploy [Google Cl
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-### Accounts
+### Accounts Needed
 * [PhoenixNAP](https://phoenixnap.com/bare-metal-cloud)
 * [Google Cloud Account](https://console.cloud.google.com/)
 * [MegaPort Account](https://docs.megaport.com/setting-up/registering/)
-
 ### Other
-* A domain name
-
-### Information
+* A domain name or subdomain you control DNS for
+### Information to Gather
 #### PhoenixNAP
 * Client ID
 * Client Secret
@@ -32,10 +30,60 @@ This [Terraform](http://terraform.io) module will allow you to deploy [Google Cl
 #### MegaPort
 * Username
 * Password
+* [Interconnect Location Name](https://cloud.google.com/network-connectivity/docs/interconnect/concepts/choosing-colocation-facilities)
+* Physical Port ID (In PhoenixNAP Datacenter)
 #### Other
 * E-Mail Address
 * Domain Name(FQDN)
 
+## Deployment
+### Authenticate to Google Cloud
+```bash
+gcloud init # Follow any prompts
+gcloud auth application-default login # Follown any prompts
+```
+### Clone the Repo
+```bash
+git clone https://github.com/GCPartner/phoenixnap-megaport-anthos.git
+cd phoenixnap-megaport-anthos
+```
+### Create your *terraform.tfvars*
+The following values will need to be modified by you.
+```bash
+cat <<EOF >terraform.tfvars 
+cluster_name                  = "my-cluster"
+domain_name                   = "my.domain.tld"
+email_address                 = "my@email.tld"
+pnap_client_id                = "******"
+pnap_client_secret            = "******"
+pnap_network_name             = "PNAP-Private-Network-Name" # Created ahead of time in PNAP
+pnap_backend_megaport_vlan_id = 13 # Provided by PNAP
+gcp_project_id                = "my-project" # Created ahead of time in GCP
+megaport_username             = "my@email.tld"
+megaport_password             = "******"
+megaport_physical_port_id     = "ee03c69b-319c-411d-abd9-03eb999bafda" # Provided by PNAP
+EOF
+```
+### Initialize Terraform
+```bash
+terraform init
+```
+### Deploy the stack
+```bash
+terraform apply --auto-approve
+```
+### What success looks like
+```
+Apply complete! Resources: 78 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+pnap_bastion_host_ip = "131.153.202.107"
+pnap_bastion_host_username = "ubuntu"
+ssh_command_for_pnap = "ssh -i /home/c0dyhi11/.ssh/anthos-pnap-lunch-xj62n ubuntu@131.153.202.107"
+ssh_key_path = "/home/c0dyhi11/.ssh/anthos-pnap-lunch-xj62n"
+website = "https://test1.codyhill.org"
+```
 <!-- BEGIN_TF_DOCS -->
 ## Inputs
 
@@ -64,6 +112,7 @@ This [Terraform](http://terraform.io) module will allow you to deploy [Google Cl
 | <a name="input_email_address"></a> [email\_address](#input\_email\_address) | The email address to use with Cert Manager | `string` | n/a | yes |
 | <a name="input_pnap_network_name"></a> [pnap\_network\_name](#input\_pnap\_network\_name) | The network\_id to use when creating server in PNAP | `string` | `""` | no |
 | <a name="input_pnap_backend_megaport_vlan_id"></a> [pnap\_backend\_megaport\_vlan\_id](#input\_pnap\_backend\_megaport\_vlan\_id) | The vLan ID mapped on the MegaPort side by PNAP (Provided by PNAP) | `number` | n/a | yes |
+| <a name="input_megaport_physical_port_id"></a> [megaport\_physical\_port\_id](#input\_megaport\_physical\_port\_id) | The Physical Port ID you'll use on within the PhoenixNAP DC to connect to MegaPort | `string` | n/a | yes |
 
 ## Outputs
 

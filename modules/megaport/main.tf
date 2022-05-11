@@ -15,8 +15,8 @@ provider "megaport" {
 }
 
 locals {
-  megaport_vxc_vlan       = 183
-  megaport_port_id        = "d20431a9-1497-44a3-825e-ce49e60e0246"
+  megaport_vxc_vlan       = var.pnap_backend_megaport_vlan_id + 1 # Arbitrary, Unique vLan for my MCR to represent the Google Virtual Wire
+  megaport_port_id        = var.megaport_physical_port_id         # Provided by PhoenixNAP if usingt their shared port in Phoenix, MegaPorts ID for your Physical CrossConnect in PhoenixNAP DataCenter
   megaport_mcr_port_speed = 1000
 }
 
@@ -40,7 +40,7 @@ resource "megaport_mcr" "mp_mcr" {
 data "megaport_partner_port" "gcp_port" {
   connect_type = "GOOGLE"
   company_name = "Google Inc"
-  product_name = "Phoenix (phx-zone1-917)"
+  product_name = "Phoenix (phx-zone1-917)" # This is the Google "OnRamp" physically in, should be in the Marketplace potentially
   location_id  = data.megaport_location.phx_pnp.id
 }
 
@@ -71,7 +71,7 @@ resource "megaport_vxc" "bmc_vxc" {
 
   a_end {
     port_id        = megaport_mcr.mp_mcr.id
-    requested_vlan = var.pnap_vlan_id
+    requested_vlan = var.pnap_vlan_id # My Private Network vLan
   }
 
   a_end_mcr_configuration {
@@ -81,6 +81,6 @@ resource "megaport_vxc" "bmc_vxc" {
 
   b_end {
     port_id        = local.megaport_port_id
-    requested_vlan = var.pnap_backend_megaport_vlan_id
+    requested_vlan = var.pnap_backend_megaport_vlan_id # PhoenixNAP Mapping for MegaPort
   }
 }
