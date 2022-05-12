@@ -1,5 +1,5 @@
 module "baremetal-anthos-cluster" {
-  source             = "github.com/GCPartner/terraform-gcpartner-anthos-baremetal?ref=v0.0.1"
+  source             = "github.com/GCPartner/terraform-gcpartner-anthos-baremetal"
   cluster_name       = format("pnap-%s", var.cluster_name)
   cloud              = var.cloud
   pnap_client_id     = var.pnap_client_id
@@ -9,8 +9,6 @@ module "baremetal-anthos-cluster" {
   pnap_cp_type       = var.pnap_cp_type
   pnap_network_name  = var.pnap_network_name
   gcp_project_id     = var.gcp_project_id
-  ansible_url        = var.ansible_url
-  ansible_tar_ball   = var.ansible_tar_ball
 }
 
 locals {
