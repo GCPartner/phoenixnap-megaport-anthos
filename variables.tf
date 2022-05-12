@@ -43,18 +43,6 @@ variable "gcp_project_id" {
   type        = string
 }
 
-variable "ansible_url" {
-  description = "The Ansible URL for the Anthos Automation"
-  type        = string
-  default     = "https://github.com/GCPartner/ansible-gcpartner-anthos-baremetal/archive/refs/heads/v0.0.1.tar.gz"
-}
-
-variable "ansible_tar_ball" {
-  description = "The name of the ansible tarball"
-  type        = string
-  default     = "v0.0.1.tar.gz"
-}
-
 variable "gcp_region" {
   description = "The GCP Region"
   type        = string
